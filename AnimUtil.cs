@@ -187,6 +187,7 @@ namespace NESSharp.Lib.Animation {
 				Use(lbl);
 				frame.Write();
 			}
+			Comment($"Animation frame labels");
 			_frameLabelList = new LabelList(_frames.Values.ToArray());
 			_frameLabelList.WriteList();
 		}

@@ -11,7 +11,7 @@ namespace NESSharp.Lib.Animation.Iterators {
 			_length	= VByte.New(Zp, $"{nameof(SequentialIterator)}{nameof(_length)}");
 			_index	= VByte.New(Zp, $"{nameof(SequentialIterator)}{nameof(_index)}");
 		}
-		public void Setup(RegisterA val) {
+		public void Setup(IOperand val) {
 			_length.Set(val);
 		}
 		public void Reset() {

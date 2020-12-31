@@ -19,6 +19,7 @@ namespace NESSharp.Lib.Animation {
 		///	are laid out in the same format to maybe provide some crossover to OAM manipulation.
 		/// </summary>
 		public VByte Attr { get; set; }
+		public void ChangeState(U8 newState) => ChangeState((IOperand)newState);
 		public void ChangeState(IOperand newState) {
 			State.Set(newState);
 			Counter.Set(0);
