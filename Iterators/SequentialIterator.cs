@@ -26,5 +26,8 @@ namespace NESSharp.Lib.Animation.Iterators {
 		public Func<Condition> Valid() {
 			return () => _index.NotEquals(_length);
 		}
+		public Func<Condition> Invalid() {
+			return () => _index.Equals(_length);
+		}
 	}
 }

@@ -10,5 +10,6 @@ namespace NESSharp.Lib.Animation.Iterators {
 		//public T Value<T>() where T : IndexingRegisterBase;
 		public RegisterA Value();
 		public Func<Condition> Valid();
+		public Func<Condition> Invalid();
 	}
 }

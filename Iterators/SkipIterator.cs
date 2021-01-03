@@ -35,5 +35,9 @@ namespace NESSharp.Lib.Animation.Iterators {
 			//TODO: ensure 64 objs haven't yet been filled this frame
 			return () => A.Set(0).Equals(0); //_index.NotEquals(_length);
 		}
+		public Func<Condition> Invalid() {
+			//TODO: ensure 64 objs haven't yet been filled this frame
+			return () => A.Set(0).NotEquals(0); //_index.NotEquals(_length);
+		}
 	}
 }

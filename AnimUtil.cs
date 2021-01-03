@@ -56,40 +56,47 @@ namespace NESSharp.Lib.Animation {
 			Y++;
 			//X.Set(0);
 			Loop.While(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
-				If(	Option(_iterator.Valid(), () => {
-						X.Set(_iterator.Value());
-						OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
-						Y++;
-						OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
-						Y++;
-						//OAM.Object[X].Attr.Set(_ptr[Y]);
-						OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
-						Y++;
-						//TODO: handle palette change here
-						//A.Set(_ptr[Y]); //compressed array of 4 palette indexes
+				If(_iterator.Invalid, () => GoTo(tileLoop.Break));
 
-						OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
-						Y++;
-						//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
-						If(	Option(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
-								//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Subtract(_animData.X));
-								OAM.Object[X].X.Set(Common.Math.Negate(A.Set(_ptr[Y])).Add(_animData.X).Subtract(8));	//attempt 1
-							}),
-							Default(() => {
-								OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));
-							})
-						);
-						
-						//OAM.Object[X].X.Set(A.Set(255).Subtract(_ptr[Y]).And(0b01000000)).Add(_animData.X));
-						Y++;
-						_iterator.Next();
+				X.Set(_iterator.Value());
+				OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
+				Y++;
+				OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
+				Y++;
+				//OAM.Object[X].Attr.Set(_ptr[Y]);
+				OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
+				Y++;
+				//TODO: handle palette change here
+				//A.Set(_ptr[Y]); //compressed array of 4 palette indexes
+
+				OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
+				Y++;
+				//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
+				If(	Option(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
+						//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Subtract(_animData.X));
+						OAM.Object[X].X.Set(Common.Math.Negate(A.Set(_ptr[Y])).Add(_animData.X).Subtract(8));	//attempt 1
 					}),
 					Default(() => {
-						GoTo(tileLoop.Break);
+						OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));
 					})
 				);
+						
+				//OAM.Object[X].X.Set(A.Set(255).Subtract(_ptr[Y]).And(0b01000000)).Add(_animData.X));
+				Y++;
+				_iterator.Next();
 				_tileIndex.Increment();
 			});
+		}
+
+		public void DrawSingleFrame(AnimationData animData) {
+			//_animData.State.Set(animData.State);
+			//_animData.Counter.Set(animData.Counter);
+			_animData.X.Set(animData.X);
+			_animData.Y.Set(animData.Y);
+			_animData.Attr.Set(animData.Attr);
+			_animData.Palette.Set(animData.Palette);
+			_ptr.PointTo(_frameLabelList[X.Set(A.Set(animData.State))]);
+			GoSub(DrawFrame);
 		}
 
 		public void DrawSingleObject(U8 tile, VByte x, VByte y, Func<RegisterA> attr) {
