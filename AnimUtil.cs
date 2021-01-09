@@ -55,8 +55,8 @@ namespace NESSharp.Lib.Animation {
 			_tileIndex.Set(0);
 			Y++;
 			//X.Set(0);
-			Loop.While(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
-				If(_iterator.Invalid, () => GoTo(tileLoop.Break));
+			Loop.While_Pre(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
+				If.True(_iterator.Invalid, tileLoop.Break);
 
 				X.Set(_iterator.Value());
 				OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
@@ -72,11 +72,12 @@ namespace NESSharp.Lib.Animation {
 				OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
 				Y++;
 				//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
-				If(	Option(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
+				If.Block(c => c
+					.True(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
 						//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Subtract(_animData.X));
 						OAM.Object[X].X.Set(Common.Math.Negate(A.Set(_ptr[Y])).Add(_animData.X).Subtract(8));	//attempt 1
-					}),
-					Default(() => {
+					})
+					.Else(() => {
 						OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));
 					})
 				);
@@ -100,7 +101,7 @@ namespace NESSharp.Lib.Animation {
 		}
 
 		public void DrawSingleObject(U8 tile, VByte x, VByte y, Func<RegisterA> attr) {
-			If(_iterator.Valid(), () => {
+			If.True(_iterator.Valid(), () => {
 				X.Set(_iterator.Value());
 				OAM.Object[X].Y.Set(y);
 				OAM.Object[X].Tile.Set(tile);
@@ -139,22 +140,21 @@ namespace NESSharp.Lib.Animation {
 			Y++; //now on last frame start
 
 			Loop.Infinite(loop => {
-				If(	Option(() => A.Set(_ptr[Y]).LessThanOrEqualTo(_animData.Counter), () => {
+				If.Block(c => c
+					.True(() => A.Set(_ptr[Y]).LessThanOrEqualTo(_animData.Counter), () => {
 						Y++; //now on frame ID
 						_ptr.PointTo(_frameLabelList[X.Set(A.Set(_ptr[Y]))]);
 						GoSub(DrawFrame); //Y is no longer needed after this because of the break
 						_animData.Counter++;
-						GoTo(loop.Break);
-					}),
-					Default(() => {
-						Y++; //now on frame ID
+						GoTo(loop.BreakLabel);
 					})
+					.Else(() => Y++) //now on frame ID
 				);
 				Y++; //now on frame start
 			});
-			If(() => _animData.Counter.Equals(_stateLength), () => {	//is counter maxed out?
+			If.True(() => _animData.Counter.Equals(_stateLength), () => {	//is counter maxed out?
 				_animData.Counter.Set(0);								//	reset it
-				If(() => _stateLoop.Equals(0), () => {					//if this state doesn't loop,
+				If.True(() => _stateLoop.Equals(0), () => {					//if this state doesn't loop,
 					_animData.State.Set(_stateNext);					//	move to the specified next state
 				});
 			});
