@@ -33,45 +33,45 @@ namespace NESSharp.Lib.Animation {
 		public void ToggleHorizontalFlip() {
 			Attr.Set(z => z.Xor(HORIZ_FLIP));
 		}
-		public override Var Copy(Var v) {
-			if (!(v is AnimationData))
-				throw new Exception("Type must be AnimationData");
-			var ad = (AnimationData)v;
-			State	= ad.State;
-			Counter	= ad.Counter;
-			X		= ad.X;
-			Y		= ad.Y;
-			Palette	= ad.Palette;
-			Attr	= ad.Attr;
+		//public override Var Copy(Var v) {
+		//	if (!(v is AnimationData))
+		//		throw new Exception("Type must be AnimationData");
+		//	var ad = (AnimationData)v;
+		//	State	= ad.State;
+		//	Counter	= ad.Counter;
+		//	X		= ad.X;
+		//	Y		= ad.Y;
+		//	Palette	= ad.Palette;
+		//	Attr	= ad.Attr;
 
-			State.Index = Index;
-			Counter.Index = Index;
-			X.Index = Index;
-			Y.Index = Index;
-			Palette.Index = Index;
-			Attr.Index = Index;
-			return this;
-		}
+		//	State.Index = Index;
+		//	Counter.Index = Index;
+		//	X.Index = Index;
+		//	Y.Index = Index;
+		//	Palette.Index = Index;
+		//	Attr.Index = Index;
+		//	return this;
+		//}
 		
-		public override Var Copy(IEnumerable<Var> v) {
-			var vars = v.ToArray();
-			if (vars.Count() != 6)
-				throw new Exception("Type must be AnimationData");
-			//var ad = (AnimationData)v;
-			State	= (VByte)vars[0];
-			Counter	= (VByte)vars[1];
-			X		= (VByte)vars[2];
-			Y		= (VByte)vars[3];
-			Palette	= (VByte)vars[4];
-			Attr	= (VByte)vars[5];
+		//public override Var Copy(IEnumerable<Var> v) {
+		//	var vars = v.ToArray();
+		//	if (vars.Count() != 6)
+		//		throw new Exception("Type must be AnimationData");
+		//	//var ad = (AnimationData)v;
+		//	State	= (VByte)vars[0];
+		//	Counter	= (VByte)vars[1];
+		//	X		= (VByte)vars[2];
+		//	Y		= (VByte)vars[3];
+		//	Palette	= (VByte)vars[4];
+		//	Attr	= (VByte)vars[5];
 
-			State.Index = Index;
-			Counter.Index = Index;
-			X.Index = Index;
-			Y.Index = Index;
-			Palette.Index = Index;
-			Attr.Index = Index;
-			return this;
-		}
+		//	State.Index = Index;
+		//	Counter.Index = Index;
+		//	X.Index = Index;
+		//	Y.Index = Index;
+		//	Palette.Index = Index;
+		//	Attr.Index = Index;
+		//	return this;
+		//}
 	}
 }

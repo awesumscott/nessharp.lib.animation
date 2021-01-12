@@ -100,13 +100,25 @@ namespace NESSharp.Lib.Animation {
 			GoSub(DrawFrame);
 		}
 
-		public void DrawSingleObject(U8 tile, VByte x, VByte y, Func<RegisterA> attr) {
+		public void DrawSingleObject(IndexingRegister reg, U8 tile, VByte x, VByte y, Func<RegisterA> attr) {
 			If.True(_iterator.Valid(), () => {
-				X.Set(_iterator.Value());
-				OAM.Object[X].Y.Set(y);
-				OAM.Object[X].Tile.Set(tile);
-				OAM.Object[X].Attr.Set(attr());
-				OAM.Object[X].X.Set(x);
+				if (reg is RegisterX)	X.Set(_iterator.Value());
+				else					Y.Set(_iterator.Value());
+				OAM.Object[reg].Y.Set(y);
+				OAM.Object[reg].Tile.Set(tile);
+				OAM.Object[reg].Attr.Set(attr());
+				OAM.Object[reg].X.Set(x);
+				_iterator.Next();
+			});
+		}
+		public void DrawSingleObject(IndexingRegister reg, U8 tile, Func<RegisterA> x, Func<RegisterA> y, Func<RegisterA> attr) {
+			If.True(_iterator.Valid(), () => {
+				if (reg is RegisterX)	X.Set(_iterator.Value());
+				else					Y.Set(_iterator.Value());
+				OAM.Object[reg].Y.Set(y());
+				OAM.Object[reg].Tile.Set(tile);
+				OAM.Object[reg].Attr.Set(attr());
+				OAM.Object[reg].X.Set(x());
 				_iterator.Next();
 			});
 		}
