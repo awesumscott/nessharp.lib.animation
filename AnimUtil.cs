@@ -43,7 +43,7 @@ namespace NESSharp.Lib.Animation {
 			return this;
 		}
 		public void StartFrame() {
-			OAM.HideAll();
+			NES.PPU.OAM.HideAll();
 			_iterator.Reset();
 		}
 		public void EndFrame() {}
@@ -59,26 +59,26 @@ namespace NESSharp.Lib.Animation {
 				If.True(_iterator.Invalid, tileLoop.Break);
 
 				X.Set(_iterator.Value());
-				OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
+				NES.PPU.OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
 				Y++;
-				OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
+				NES.PPU.OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
 				Y++;
 				//OAM.Object[X].Attr.Set(_ptr[Y]);
-				OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
+				NES.PPU.OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
 				Y++;
 				//TODO: handle palette change here
 				//A.Set(_ptr[Y]); //compressed array of 4 palette indexes
 
-				OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
+				NES.PPU.OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
 				Y++;
 				//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
 				If.Block(c => c
 					.True(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
 						//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Subtract(_animData.X));
-						OAM.Object[X].X.Set(Common.Math.Negate(A.Set(_ptr[Y])).Add(_animData.X).Subtract(8));	//attempt 1
+						NES.PPU.OAM.Object[X].X.Set(Common.Math.Negate(A.Set(_ptr[Y])).Add(_animData.X).Subtract(8));	//attempt 1
 					})
 					.Else(() => {
-						OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));
+						NES.PPU.OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));
 					})
 				);
 						
@@ -104,10 +104,10 @@ namespace NESSharp.Lib.Animation {
 			If.True(_iterator.Valid(), () => {
 				if (reg is RegisterX)	X.Set(_iterator.Value());
 				else					Y.Set(_iterator.Value());
-				OAM.Object[reg].Y.Set(y);
-				OAM.Object[reg].Tile.Set(tile);
-				OAM.Object[reg].Attr.Set(attr());
-				OAM.Object[reg].X.Set(x);
+				NES.PPU.OAM.Object[reg].Y.Set(y);
+				NES.PPU.OAM.Object[reg].Tile.Set(tile);
+				NES.PPU.OAM.Object[reg].Attr.Set(attr());
+				NES.PPU.OAM.Object[reg].X.Set(x);
 				_iterator.Next();
 			});
 		}
@@ -115,10 +115,10 @@ namespace NESSharp.Lib.Animation {
 			If.True(_iterator.Valid(), () => {
 				if (reg is RegisterX)	X.Set(_iterator.Value());
 				else					Y.Set(_iterator.Value());
-				OAM.Object[reg].Y.Set(y());
-				OAM.Object[reg].Tile.Set(tile);
-				OAM.Object[reg].Attr.Set(attr());
-				OAM.Object[reg].X.Set(x());
+				NES.PPU.OAM.Object[reg].Y.Set(y());
+				NES.PPU.OAM.Object[reg].Tile.Set(tile);
+				NES.PPU.OAM.Object[reg].Attr.Set(attr());
+				NES.PPU.OAM.Object[reg].X.Set(x());
 				_iterator.Next();
 			});
 		}
