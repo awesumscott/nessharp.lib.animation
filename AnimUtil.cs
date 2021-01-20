@@ -53,24 +53,24 @@ namespace NESSharp.Lib.Animation {
 			Y.Set(0);
 			_numTiles.Set(A.Set(_ptr[Y]));
 			_tileIndex.Set(0);
-			Y++;
+			Y.Increment();
 			//X.Set(0);
 			Loop.While_Pre(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
 				If.True(_iterator.Invalid, tileLoop.Break);
 
 				X.Set(_iterator.Value());
 				NES.PPU.OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
-				Y++;
+				Y.Increment();
 				NES.PPU.OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
-				Y++;
+				Y.Increment();
 				//OAM.Object[X].Attr.Set(_ptr[Y]);
 				NES.PPU.OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
-				Y++;
+				Y.Increment();
 				//TODO: handle palette change here
 				//A.Set(_ptr[Y]); //compressed array of 4 palette indexes
 
 				NES.PPU.OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
-				Y++;
+				Y.Increment();
 				//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
 				If.Block(c => c
 					.True(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
@@ -83,9 +83,9 @@ namespace NESSharp.Lib.Animation {
 				);
 						
 				//OAM.Object[X].X.Set(A.Set(255).Subtract(_ptr[Y]).And(0b01000000)).Add(_animData.X));
-				Y++;
+				Y.Increment();
 				_iterator.Next();
-				_tileIndex.Increment();
+				_tileIndex.Inc();
 			});
 		}
 
@@ -145,24 +145,24 @@ namespace NESSharp.Lib.Animation {
 			//NES.PPU.Mask.Set(NES.PPU.LazyMask.Set(z => z.Or(0b10000000)));
 			_ptr.PointTo(_stateLabelList[X.Set(_animData.State)]);
 			_stateLength.Set(_ptr[Y.Set(0)]);
-			Y++;
+			Y.Increment();
 			_stateLoop.Set(_ptr[Y]);
-			Y++;
+			Y.Increment();
 			_stateNext.Set(_ptr[Y]);
-			Y++; //now on last frame start
+			Y.Increment(); //now on last frame start
 
 			Loop.Infinite(loop => {
 				If.Block(c => c
 					.True(() => A.Set(_ptr[Y]).LessThanOrEqualTo(_animData.Counter), () => {
-						Y++; //now on frame ID
+						Y.Increment(); //now on frame ID
 						_ptr.PointTo(_frameLabelList[X.Set(A.Set(_ptr[Y]))]);
 						GoSub(DrawFrame); //Y is no longer needed after this because of the break
-						_animData.Counter++;
+						_animData.Counter.Inc();
 						GoTo(loop.BreakLabel);
 					})
-					.Else(() => Y++) //now on frame ID
+					.Else(() => Y.Increment()) //now on frame ID
 				);
-				Y++; //now on frame start
+				Y.Increment(); //now on frame start
 			});
 			If.True(() => _animData.Counter.Equals(_stateLength), () => {	//is counter maxed out?
 				_animData.Counter.Set(0);								//	reset it
@@ -176,17 +176,15 @@ namespace NESSharp.Lib.Animation {
 		[DataSection]
 		private void AnimData() {
 			//General data
-			_tileOffsetLabel = Labels.New();
-			Use(_tileOffsetLabel);
+			_tileOffsetLabel = Labels.New().Write();
 			Raw(animConfig.Offset);
 
 			//State data
 			var stateLabels = new List<Label>();
 			foreach (var state in animConfig.States) {
-				var lbl = Labels.New();
 				Comment($"Animation state definition: {state.Name}");
+				var lbl = Labels.New().Write();
 				stateLabels.Add(lbl);
-				Use(lbl);
 				Raw((byte)state.Length);
 				Raw(state.Loop ? (byte)1 : (byte)0);
 				Raw((byte)(state.NextState ?? 0));
@@ -201,9 +199,8 @@ namespace NESSharp.Lib.Animation {
 
 			foreach (var frame in animConfig.Frames) {
 				Comment($"Animation frame definition: {frame.Name}");
-				var lbl = Labels.New();
+				var lbl = Labels.New().Write();
 				_frames.Add(frame.Name, lbl);
-				Use(lbl);
 				frame.Write();
 			}
 			Comment($"Animation frame labels");

@@ -18,7 +18,7 @@ namespace NESSharp.Lib.Animation.Iterators {
 			_index.Set(0);
 		}
 		public void Next() {
-			_index.Increment();
+			_index.Inc();
 		}
 		public RegisterA Value() {
 			return _index.Multiply(4);

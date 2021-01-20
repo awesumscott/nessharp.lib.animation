@@ -34,7 +34,7 @@ namespace NESSharp.Lib.Animation {
 			Attr.Set(z => z.Xor(HORIZ_FLIP));
 		}
 		//public override Var Copy(Var v) {
-		//	if (!(v is AnimationData))
+		//	if (v is not AnimationData)
 		//		throw new Exception("Type must be AnimationData");
 		//	var ad = (AnimationData)v;
 		//	State	= ad.State;
