@@ -99,6 +99,16 @@ namespace NESSharp.Lib.Animation {
 			_ptr.PointTo(_frameLabelList[X.Set(A.Set(animData.State))]);
 			GoSub(DrawFrame);
 		}
+		public void DrawSingleFrame(Func<IOperand> x, Func<IOperand> y, Func<IOperand> palette, Func<IOperand> attr, Func<IOperand> state) {
+			//_animData.State.Set(animData.State);
+			//_animData.Counter.Set(animData.Counter);
+			_animData.X.Set(x());
+			_animData.Y.Set(y());
+			_animData.Attr.Set(attr());
+			_animData.Palette.Set(palette());
+			_ptr.PointTo(_frameLabelList[X.Set(A.Set(state()))]);
+			GoSub(DrawFrame);
+		}
 
 		public void DrawSingleObject(IndexingRegister reg, U8 tile, VByte x, VByte y, Func<RegisterA> attr) {
 			If.True(_iterator.Valid(), () => {
