@@ -36,7 +36,7 @@ namespace NESSharp.Lib.Animation {
 		
 		public void LoadConfig(string file) {
 			if (!Json.TryLoadFile(file, out animConfig)) throw new Exception("Anim config file is bad");
-			Console.WriteLine(animConfig);
+			//Console.WriteLine(animConfig);
 		}
 		public AnimUtil Initialize(IIterator iterator) {
 			_iterator = iterator;
@@ -110,7 +110,7 @@ namespace NESSharp.Lib.Animation {
 			GoSub(DrawFrame);
 		}
 
-		public void DrawSingleObject(IndexingRegister reg, U8 tile, VByte x, VByte y, Func<RegisterA> attr) {
+		public void DrawSingleObject(IndexingRegister reg, U8 tile, IOperand x, IOperand y, Func<RegisterA> attr) {
 			If.True(_iterator.Valid(), () => {
 				if (reg is RegisterX)	X.Set(_iterator.Value());
 				else					Y.Set(_iterator.Value());
@@ -168,7 +168,7 @@ namespace NESSharp.Lib.Animation {
 						_ptr.PointTo(_frameLabelList[X.Set(A.Set(_ptr[Y]))]);
 						GoSub(DrawFrame); //Y is no longer needed after this because of the break
 						_animData.Counter.Inc();
-						GoTo(loop.BreakLabel);
+						loop.Break();
 					})
 					.Else(() => Y.Increment()) //now on frame ID
 				);
