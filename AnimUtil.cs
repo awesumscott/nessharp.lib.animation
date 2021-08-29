@@ -53,24 +53,24 @@ namespace NESSharp.Lib.Animation {
 			Y.Set(0);
 			_numTiles.Set(A.Set(_ptr[Y]));
 			_tileIndex.Set(0);
-			Y.Increment();
+			Y.Inc();
 			//X.Set(0);
 			Loop.While_Pre(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
 				If.True(_iterator.Invalid, tileLoop.Break);
 
 				X.Set(_iterator.Value());
 				NES.PPU.OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
-				Y.Increment();
+				Y.Inc();
 				NES.PPU.OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
-				Y.Increment();
+				Y.Inc();
 				//OAM.Object[X].Attr.Set(_ptr[Y]);
 				NES.PPU.OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
-				Y.Increment();
+				Y.Inc();
 				//TODO: handle palette change here
 				//A.Set(_ptr[Y]); //compressed array of 4 palette indexes
 
 				NES.PPU.OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
-				Y.Increment();
+				Y.Inc();
 				//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
 				If.Block(c => c
 					.True(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
@@ -83,7 +83,7 @@ namespace NESSharp.Lib.Animation {
 				);
 						
 				//OAM.Object[X].X.Set(A.Set(255).Subtract(_ptr[Y]).And(0b01000000)).Add(_animData.X));
-				Y.Increment();
+				Y.Inc();
 				_iterator.Next();
 				_tileIndex.Inc();
 			});
@@ -112,8 +112,7 @@ namespace NESSharp.Lib.Animation {
 
 		public void DrawSingleObject(IndexingRegister reg, U8 tile, IOperand x, IOperand y, Func<RegisterA> attr) {
 			If.True(_iterator.Valid(), () => {
-				if (reg is RegisterX)	X.Set(_iterator.Value());
-				else					Y.Set(_iterator.Value());
+				reg.Set(_iterator.Value());
 				NES.PPU.OAM.Object[reg].Y.Set(y);
 				NES.PPU.OAM.Object[reg].Tile.Set(tile);
 				NES.PPU.OAM.Object[reg].Attr.Set(attr());
@@ -123,8 +122,7 @@ namespace NESSharp.Lib.Animation {
 		}
 		public void DrawSingleObject(IndexingRegister reg, U8 tile, Func<RegisterA> x, Func<RegisterA> y, Func<RegisterA> attr) {
 			If.True(_iterator.Valid(), () => {
-				if (reg is RegisterX)	X.Set(_iterator.Value());
-				else					Y.Set(_iterator.Value());
+				reg.Set(_iterator.Value());
 				NES.PPU.OAM.Object[reg].Y.Set(y());
 				NES.PPU.OAM.Object[reg].Tile.Set(tile);
 				NES.PPU.OAM.Object[reg].Attr.Set(attr());
@@ -155,24 +153,24 @@ namespace NESSharp.Lib.Animation {
 			//NES.PPU.Mask.Set(NES.PPU.LazyMask.Set(z => z.Or(0b10000000)));
 			_ptr.PointTo(_stateLabelList[X.Set(_animData.State)]);
 			_stateLength.Set(_ptr[Y.Set(0)]);
-			Y.Increment();
+			Y.Inc();
 			_stateLoop.Set(_ptr[Y]);
-			Y.Increment();
+			Y.Inc();
 			_stateNext.Set(_ptr[Y]);
-			Y.Increment(); //now on last frame start
+			Y.Inc(); //now on last frame start
 
 			Loop.Infinite(loop => {
 				If.Block(c => c
 					.True(() => A.Set(_ptr[Y]).LessThanOrEqualTo(_animData.Counter), () => {
-						Y.Increment(); //now on frame ID
+						Y.Inc(); //now on frame ID
 						_ptr.PointTo(_frameLabelList[X.Set(A.Set(_ptr[Y]))]);
 						GoSub(DrawFrame); //Y is no longer needed after this because of the break
 						_animData.Counter.Inc();
 						loop.Break();
 					})
-					.Else(() => Y.Increment()) //now on frame ID
+					.Else(() => Y.Inc()) //now on frame ID
 				);
-				Y.Increment(); //now on frame start
+				Y.Inc(); //now on frame start
 			});
 			If.True(() => _animData.Counter.Equals(_stateLength), () => {	//is counter maxed out?
 				_animData.Counter.Set(0);								//	reset it
