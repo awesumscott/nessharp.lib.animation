@@ -55,7 +55,7 @@ namespace NESSharp.Lib.Animation {
 			_tileIndex.Set(0);
 			Y.Inc();
 			//X.Set(0);
-			Loop.While_Pre(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
+			Loop.While_PreCondition_NoInc(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
 				If.True(_iterator.Invalid, tileLoop.Break);
 
 				X.Set(_iterator.Value());
