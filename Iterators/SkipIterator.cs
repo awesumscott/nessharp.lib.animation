@@ -1,6 +1,7 @@
 ﻿using NESSharp.Core;
 using NESSharp.Common;
 using System;
+using static NESSharp.Core.CPU6502;
 
 namespace NESSharp.Lib.Animation.Iterators;
 
