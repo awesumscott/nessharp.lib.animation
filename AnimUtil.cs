@@ -43,7 +43,7 @@ public class AnimUtil : Module {
 		return this;
 	}
 	public void StartFrame() {
-		NES.PPU.OAM.HideAll();
+		Hardware.HideAll();
 		_iterator.Reset();
 	}
 	public void EndFrame() {}
