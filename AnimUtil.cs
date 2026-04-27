@@ -1,10 +1,9 @@
-﻿using NESSharp.Common;
+using NESSharp.Common;
 using NESSharp.Core;
 using NESSharp.Lib.Animation.Iterators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static NESSharp.Core.CPU6502;
 
 namespace NESSharp.Lib.Animation;
 
@@ -51,40 +50,40 @@ public class AnimUtil : Module {
 
 	[Subroutine]
 	private void DrawFrame() {
-		Y.Set(0);
-		_numTiles.Set(A.Set(_ptr[Y]));
+		CPU.Y.Set(0);
+		_numTiles.Set(CPU.A.Set(_ptr[CPU.Y]));
 		_tileIndex.Set(0);
-		Y.Inc();
-		//X.Set(0);
+		CPU.Y.Inc();
+		//CPU.X.Set(0);
 		Loop.While_PreCondition_NoInc(() => _tileIndex.NotEquals(_numTiles), tileLoop => {
 			If.True(_iterator.Invalid, tileLoop.Break);
 
-			X.Set(_iterator.Value());
-			NES.PPU.OAM.Object[X].Y.Set(A.Set(_ptr[Y]).Add(_animData.Y));
-			Y.Inc();
-			NES.PPU.OAM.Object[X].Tile.Set(A.Set(_ptr[Y]).Add(_tileOffsetLabel));
-			Y.Inc();
-			//OAM.Object[X].Attr.Set(_ptr[Y]);
-			NES.PPU.OAM.Object[X].Attr.Set(A.Set(_ptr[Y]).Or(_animData.Attr));
-			Y.Inc();
+			CPU.X.Set(_iterator.Value());
+			NES.PPU.OAM.Object[CPU.X].Y.Set(CPU.A.Set(_ptr[CPU.Y]).Add(_animData.Y));
+			CPU.Y.Inc();
+			NES.PPU.OAM.Object[CPU.X].Tile.Set(CPU.A.Set(_ptr[CPU.Y]).Add(_tileOffsetLabel));
+			CPU.Y.Inc();
+			//OAM.Object[CPU.X].Attr.Set(_ptr[CPU.Y]);
+			NES.PPU.OAM.Object[CPU.X].Attr.Set(CPU.A.Set(_ptr[CPU.Y]).Or(_animData.Attr));
+			CPU.Y.Inc();
 			//TODO: handle palette change here
-			//A.Set(_ptr[Y]); //compressed array of 4 palette indexes
+			//CPU.A.Set(_ptr[CPU.Y]); //compressed array of 4 palette indexes
 
-			NES.PPU.OAM.Object[X].Attr.Set(z => z.Or(_animData.Palette));
-			Y.Inc();
-			//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));										//original
+			NES.PPU.OAM.Object[CPU.X].Attr.Set(z => z.Or(_animData.Palette));
+			CPU.Y.Inc();
+			//OAM.Object[CPU.X].X.Set(CPU.A.Set(_ptr[CPU.Y]).Add(_animData.X));										//original
 			If.Block(c => c
 				.True(() => _animData.Attr.And(0b01000000).NotEquals(0), () => {
-					//OAM.Object[X].X.Set(A.Set(_ptr[Y]).Subtract(_animData.X));
-					NES.PPU.OAM.Object[X].X.Set(Common.Math.Negate(A.Set(_ptr[Y])).Add(_animData.X).Subtract(8));	//attempt 1
+					//OAM.Object[CPU.X].X.Set(CPU.A.Set(_ptr[CPU.Y]).Subtract(_animData.X));
+					NES.PPU.OAM.Object[CPU.X].X.Set(Common.Math.Negate(CPU.A.Set(_ptr[CPU.Y])).Add(_animData.X).Subtract(8));	//attempt 1
 				})
 				.Else(() => {
-					NES.PPU.OAM.Object[X].X.Set(A.Set(_ptr[Y]).Add(_animData.X));
+					NES.PPU.OAM.Object[CPU.X].X.Set(CPU.A.Set(_ptr[CPU.Y]).Add(_animData.X));
 				})
 			);
 					
-			//OAM.Object[X].X.Set(A.Set(255).Subtract(_ptr[Y]).And(0b01000000)).Add(_animData.X));
-			Y.Inc();
+			//OAM.Object[CPU.X].X.Set(CPU.A.Set(255).Subtract(_ptr[CPU.Y]).And(0b01000000)).Add(_animData.X));
+			CPU.Y.Inc();
 			_iterator.Next();
 			_tileIndex.Inc();
 		});
@@ -97,7 +96,7 @@ public class AnimUtil : Module {
 		_animData.Y.Set(animData.Y);
 		_animData.Attr.Set(animData.Attr);
 		_animData.Palette.Set(animData.Palette);
-		_ptr.PointTo(_frameLabelList[X.Set(A.Set(animData.State))]);
+		_ptr.PointTo(_frameLabelList[CPU.X.Set(CPU.A.Set(animData.State))]);
 		AL.GoSub(DrawFrame);
 	}
 	public void DrawSingleFrame(Func<IOperand> x, Func<IOperand> y, Func<IOperand> palette, Func<IOperand> attr, Func<IOperand> state) {
@@ -107,7 +106,7 @@ public class AnimUtil : Module {
 		_animData.Y.Set(y());
 		_animData.Attr.Set(attr());
 		_animData.Palette.Set(palette());
-		_ptr.PointTo(_frameLabelList[X.Set(A.Set(state()))]);
+		_ptr.PointTo(_frameLabelList[CPU.X.Set(CPU.A.Set(state()))]);
 		AL.GoSub(DrawFrame);
 	}
 
@@ -152,26 +151,26 @@ public class AnimUtil : Module {
 	[Subroutine]
 	private void Update() {
 		//NES.PPU.Mask.Set(NES.PPU.LazyMask.Set(z => z.Or(0b10000000)));
-		_ptr.PointTo(_stateLabelList[X.Set(_animData.State)]);
-		_stateLength.Set(_ptr[Y.Set(0)]);
-		Y.Inc();
-		_stateLoop.Set(_ptr[Y]);
-		Y.Inc();
-		_stateNext.Set(_ptr[Y]);
-		Y.Inc(); //now on last frame start
+		_ptr.PointTo(_stateLabelList[CPU.X.Set(_animData.State)]);
+		_stateLength.Set(_ptr[CPU.Y.Set(0)]);
+		CPU.Y.Inc();
+		_stateLoop.Set(_ptr[CPU.Y]);
+		CPU.Y.Inc();
+		_stateNext.Set(_ptr[CPU.Y]);
+		CPU.Y.Inc(); //now on last frame start
 
 		Loop.Infinite(loop => {
 			If.Block(c => c
-				.True(() => A.Set(_ptr[Y]).LessThanOrEqualTo(_animData.Counter), () => {
-					Y.Inc(); //now on frame ID
-					_ptr.PointTo(_frameLabelList[X.Set(A.Set(_ptr[Y]))]);
-					AL.GoSub(DrawFrame); //Y is no longer needed after this because of the break
+				.True(() => CPU.A.Set(_ptr[CPU.Y]).LessThanOrEqualTo(_animData.Counter), () => {
+					CPU.Y.Inc(); //now on frame ID
+					_ptr.PointTo(_frameLabelList[CPU.X.Set(CPU.A.Set(_ptr[CPU.Y]))]);
+					AL.GoSub(DrawFrame); //CPU.Y is no longer needed after this because of the break
 					_animData.Counter.Inc();
 					loop.Break();
 				})
-				.Else(() => Y.Inc()) //now on frame ID
+				.Else(() => CPU.Y.Inc()) //now on frame ID
 			);
-			Y.Inc(); //now on frame start
+			CPU.Y.Inc(); //now on frame start
 		});
 		If.True(() => _animData.Counter.Equals(_stateLength), () => {	//is counter maxed out?
 			_animData.Counter.Set(0);								//	reset it

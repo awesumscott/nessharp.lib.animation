@@ -1,7 +1,6 @@
-﻿using NESSharp.Core;
+using NESSharp.Core;
 using NESSharp.Common;
 using System;
-using static NESSharp.Core.CPU6502;
 
 namespace NESSharp.Lib.Animation.Iterators;
 
@@ -28,10 +27,10 @@ public class SkipIterator : Module, IIterator {
 	public RegisterA Value() => _index.Multiply(4);
 	public Func<Condition> Valid() {
 		//TODO: ensure 64 objs haven't yet been filled this frame
-		return () => A.Set(0).Equals(0); //_index.NotEquals(_length);
+		return () => CPU.A.Set(0).Equals(0); //_index.NotEquals(_length);
 	}
 	public Func<Condition> Invalid() {
 		//TODO: ensure 64 objs haven't yet been filled this frame
-		return () => A.Set(0).NotEquals(0); //_index.NotEquals(_length);
+		return () => CPU.A.Set(0).NotEquals(0); //_index.NotEquals(_length);
 	}
 }
